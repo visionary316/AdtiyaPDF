@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aditya PDF</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+    --primary-bg: #f5f8fa; /* Soft off-white with a hint of blue */
+    --secondary-bg: #ffffff; /* Clean white for contrast */
+    --primary-text: #1a1a2e; /* Very dark navy */
+    --secondary-text: #2e3a59; /* Muted deep blue-gray */
+    --accent-color: #3a86ff; /* Elegant royal blue accent */
+    --border-color: #dce3ec; /* Light cool gray-blue border */
+    --shadow-color: rgba(58, 134, 255, 0.1); /* Soft blue shadow */
+    --transition-duration: 0.2s;
+}
+
+body.dark {
+    --primary-bg: #0d1117; /* Deep black-blue */
+    --secondary-bg: #161b22; /* Slightly lighter black-blue */
+    --primary-text: #ffffff; /* Pure white text */
+    --secondary-text: #c9d1d9; /* Soft cool gray-blue text */
+    --accent-color: #3a86ff; /* Elegant royal blue accent */
+    --border-color: #30363d; /* Dark gray-blue border */
+    --shadow-color: rgba(58, 134, 255, 0.2); /* Elegant soft blue shadow */
+}
+
+
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--primary-text);
+            transition: background-color var(--transition-duration), color var(--transition-duration);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            /* Align container to top */
+            min-height: 100vh;
+            padding-top: 20px;
+            /* Add some padding at the top */
+            padding-bottom: 20px;
+            /* Add some padding at the bottom */
+            box-sizing: border-box;
+            user-select: none;
+            /* Standard property */
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* Internet Explorer/Edge */
+        }
+
+        .container {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            padding: 30px;
+            max-width: 960px;
+            width: 95%;
+            box-sizing: border-box;
+            transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--primary-text);
+        }
+
+        #dropArea {
+            border: 2px dashed var(--accent-color);
+            border-radius: 6px;
+            padding: 60px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            background-color: var(--primary-bg);
+            color: var(--secondary-text);
+            transition: background-color var(--transition-duration), color var(--transition-duration), border-color var(--transition-duration);
+        }
+
+        #dropArea.dragover {
+            border-color: #0056b3;
+            background-color: color-mix(in srgb, var(--primary-bg) 90%, var(--accent-color));
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-group p {
+            margin-bottom: 15px;
+            color: var(--secondary-text);
+            font-size: 15px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .btn-set {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            /* Allow buttons to wrap */
+        }
+
+        .btn-set button {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--secondary-bg);
+            color: var(--primary-text);
+            box-shadow: 0 1px 3px var(--shadow-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color var(--transition-duration), color var(--transition-duration), border-color var(--transition-duration), transform 0.1s;
+        }
+
+        .btn-set button.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .btn-set button:hover:not(.active) {
+            transform: scale(1.02);
+            background-color: color-mix(in srgb, var(--secondary-bg) 90%, var(--primary-text));
+            /* Subtle hover */
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            /* Align with options */
+        }
+
+        .checkbox-container label {
+            font-size: 14px;
+            color: var(--secondary-text);
+            margin-left: 10px;
+            cursor: pointer;
+            /* Make label clickable */
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+            /* Prevent shrinking */
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        .preview-container {
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 5px;
+            background-color: var(--primary-bg);
+            transition: background-color var(--transition-duration), border-color var(--transition-duration);
+        }
+
+        .preview-container h3 {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .preview {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            align-items: center;
+            gap: 15px;
+            min-height: 200px;
+            padding: 10px;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge */
+        }
+
+        .preview::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari, Opera */
+        }
+
+        .image-container {
+            position: relative;
+            background-color: var(--secondary-bg);
+            /* Give it a background */
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 5px;
+            /* Add some padding */
+            cursor: grab;
+            /* Indicate draggable */
+            transition: border-color var(--transition-duration), transform 0.3s ease-in-out, box-shadow 0.2s ease-in-out, opacity 0.3s ease-in-out;
+            /* Added opacity to transition */
+            display: flex;
+            /* Use flex for content centering */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            /* Removed outline: none; from here */
+        }
+
+        /* Apply outline none more specifically to interactive states */
+        .image-container:focus,
+        .image-container:active,
+        .image-container[draggable="true"]:focus,
+        /* Ensure draggable focus is covered */
+        .image-container[draggable="true"]:active {
+            outline: none !important;
+        }
+
+        .image-container.dragging {
+            cursor: grabbing;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* Fixed typo 'phx' to 'px' */
+        }
+
+
+        .preview img {
+            display: block;
+            width: auto;
+            height: auto;
+            max-width: 200px;
+            /* Adjusted max width for better grid */
+            max-height: 200px;
+            /* Adjusted max height */
+            object-fit: contain;
+            transition: opacity var(--transition-duration);
+            border-radius: 2px;
+            /* Slight radius inside padding */
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Darker overlay */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            /* Space top/bottom elements */
+            align-items: center;
+            /* Center content horizontally */
+            padding: 5px;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity var(--transition-duration);
+            border-radius: 4px;
+            /* Match container */
+            pointer-events: none;
+            /* Allow clicks/drags to pass through initially */
+        }
+
+        .image-container:hover .image-overlay {
+            opacity: 1;
+            pointer-events: auto;
+            /* Enable interactions when visible */
+        }
+
+        .overlay-top {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            /* Number left, remove button right */
+            align-items: center;
+        }
+
+        .image-number {
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .remove-btn {
+            background: #00000000;
+            color: white;
+            border: none;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            border-radius: 25%;
+            transition: background-color 0.2s;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            /* Add border back */
+            background-color: var(--secondary-bg);
+            color: var(--primary-text);
+            box-shadow: 0 1px 3px var(--shadow-color);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color var(--transition-duration), color var(--transition-duration), transform 0.1s, border-color var(--transition-duration);
+        }
+
+        .controls button:hover {
+            transform: scale(1.02);
+            border-color: color-mix(in srgb, var(--border-color) 70%, var(--primary-text));
+            background-color: color-mix(in srgb, var(--secondary-bg) 95%, var(--primary-text));
+        }
+
+        #clearAll:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .generate-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color var(--transition-duration), transform 0.1s, opacity 0.2s;
+            width: 20%;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background-color: color-mix(in srgb, var(--accent-color) 85%, black);
+            /* Darken accent color */
+            transform: scale(1.01);
+            /* Subtle scale */
+        }
+
+        .generate-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            color: #666666;
+            opacity: 0.7;
+        }
+
+
+        #progressContainer {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: none;
+            /* Initially hidden */
+        }
+
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .no-images {
+            color: var(--secondary-text);
+            font-style: italic;
+            text-align: center;
+            padding: 20px 0;
+            /* More padding */
+            width: 100%;
+            /* Take full width */
+        }
+
+        h1,
+        h3 {
+            color: var(--secondary-text);
+        }
+
+        .Logo {
+            color: var(--accent-color);
+        }
+
+        .name {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .name input {
+            width: 50%;
+            padding: 7.5px;
+            font-size: 20px;
+            background-color: var(--secondary-bg);
+            border: var(--border-color) 2px solid;
+            border-radius: 5px;
+            color: white;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="Logo" style="font-size: 32px; font-family: 'Times New Roman', Times, serif;">Aditya PDF</h1>
+            <label class="switch" title="Toggle dark/light theme">
+                <input type="checkbox" id="themeToggle">
+                <span class="slider round"></span>
+        </div>
+
+        <div id="dropArea">
+            Drag and Drop Images Here
+            <input type="file" id="fileInput" accept="image/*,.jpeg,.jpg,.png,.gif,.bmp,.webp" multiple />
+            <p style="font-size: 12px; margin-top: 10px; color: var(--secondary-text);">(Supports: JPG, PNG, GIF, BMP,
+                WEBP)</p>
+        </div>
+
+        <div class="options">
+            <div class="option-group">
+                <p>Resolution</p>
+                <div class="btn-set" id="resolutionBtns">
+                    <button data-value="720p">720p</button>
+                    <button data-value="1080p" class="active">1080p</button>
+                    <button data-value="2160p">2160p</button>
+                    <button data-value="4k">4k</button>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <p>Paper Size</p>
+                <div class="btn-set" id="paperBtns">
+                    <button data-value="a4" class="active">A4</button>
+                    <button data-value="a3">A3</button>
+                    <button data-value="a5">A5</button>
+                    <button data-value="letter">Letter</button>
+                </div>
+            </div>
+
+            <div class="checkbox-container">
+                <label class="switch">
+                    <input type="checkbox" id="blurBackground">
+                    <span class="slider round"></span>
+                </label>
+                <label for="blurBackground">Use Blurred Background</label>
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <h3>Image Preview (Drag to reorder)</h3>
+            <div id="preview" class="preview">
+                <p id="noImages" class="no-images">No images selected yet.</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="clearAll" title="Remove all images">Clear All</button>
+        </div>
+
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <div class="submit">
+            <div class="name">
+                <input type="text" id="FileName" placeholder="File Name...">
+                <button id="generatePdf" class="generate-btn" disabled>Generate PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // --- DOM Elements ---
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const generateBtn = document.getElementById('generatePdf');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const themeToggle = document.getElementById('themeToggle');
+        const blurBackgroundCheckbox = document.getElementById('blurBackground');
+        const clearAllBtn = document.getElementById('clearAll');
+        let noImagesMessage = document.getElementById('noImages'); // Use let as we might re-get after clearing
+
+      
+        let files = [];
+        let draggedItem = null; // To keep track of the item being dragged
+
+        // --- Initialization ---
+        window.onload = () => {
+            // Load theme preference only (image state is not persisted)
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme === 'dark') {
+                document.body.classList.add('dark');
+                themeToggle.checked = true;
+            } else {
+                document.body.classList.remove('dark');
+                themeToggle.checked = false;
+            }
+
+            // No state loading, just update button state based on initial empty state
+            updateGenerateButtonState();
+            // Ensure the no images message is visible initially
+            if (preview.querySelectorAll('.image-container').length === 0) { // Check if there are no image containers
+                // Ensure the paragraph exists, add it if it doesn't (might happen if cleared)
+                if (!document.getElementById('noImages')) {
+                    const msg = document.createElement('p');
+                    msg.id = 'noImages';
+                    msg.classList.add('no-images');
+                    msg.textContent = 'No images selected yet.';
+                    preview.appendChild(msg);
+                    noImagesMessage = document.getElementById('noImages'); // Update reference
+                }
+                noImagesMessage.style.display = 'block';
+            } else {
+                // If there are already images (shouldn't happen in this version without loading state), hide the message
+                if (document.getElementById('noImages')) {
+                    noImagesMessage.style.display = 'none';
+                }
+            }
+        };
+
+        // --- File Management ---
+        function updateFiles(newFiles) {
+            // Adds new files to the 'files' array and updates the preview
+            const startIndex = files.length; // Get the index where new files start
+            files = [...files, ...newFiles]; // Append new files
+            showPreview(newFiles, startIndex); // Render only the newly added files
+            // updateGenerateButtonState(); // Moved inside showPreview onload
+            if (noImagesMessage) {
+                noImagesMessage.style.display = 'none'; // Hide message when files are added
+            }
+        }
+
+        function removeFile(originalIndexToRemove) {
+            // Removes a file visually and marks it in the state array as null
+            const elementToRemove = preview.querySelector(`.image-container[data-index="${originalIndexToRemove}"]`);
+
+            if (elementToRemove) {
+                // Apply animation styles for removal
+                elementToRemove.style.opacity = '0';
+                elementToRemove.style.transform = 'scale(0.8)';
+
+                setTimeout(() => {
+                    elementToRemove.remove(); // Remove from DOM after animation
+
+                    // Mark the file as null in the main 'files' array instead of splicing
+                    // This preserves original indices for other elements still in the array
+                    if (originalIndexToRemove < files.length) {
+                        files[originalIndexToRemove] = null; // Mark as removed
+                    }
+
+                    updateImageNumbers(); // Renumber remaining items based on DOM order
+                    updateGenerateButtonState();
+
+                    // Check if preview is now empty (only the noImages message remains)
+                    if (preview.querySelectorAll('.image-container').length === 0) {
+                        // Ensure the paragraph exists before showing it
+                        if (!document.getElementById('noImages')) {
+                            const msg = document.createElement('p');
+                            msg.id = 'noImages';
+                            msg.classList.add('no-images');
+                            msg.textContent = 'No images selected yet.';
+                            preview.appendChild(msg);
+                            noImagesMessage = document.getElementById('noImages'); // Update reference
+                        }
+                        noImagesMessage.style.display = 'block';
+                    } else {
+                        if (noImagesMessage) {
+                            noImagesMessage.style.display = 'none'; // Should be hidden if there are images, but double check
+                        }
+                    }
+                }, 300); // Animation duration (matches CSS transition)
+            } else {
+                console.warn(`Could not find element with index ${originalIndexToRemove} to remove from DOM.`);
+                // Fallback: Mark the file as null in the array even if DOM element wasn't found
+                if (originalIndexToRemove < files.length) {
+                    files[originalIndexToRemove] = null;
+                    console.warn(`Marked file at index ${originalIndexToRemove} as null in state array.`);
+                }
+                updateGenerateButtonState();
+                // Check if preview is now empty (based on actual DOM)
+                if (preview.querySelectorAll('.image-container').length === 0) {
+                    if (!document.getElementById('noImages')) {
+                        const msg = document.createElement('p');
+                        msg.id = 'noImages';
+                        msg.classList.add('no-images');
+                        msg.textContent = 'No images selected yet.';
+                        preview.appendChild(msg);
+                        noImagesMessage = document.getElementById('noImages'); // Update reference
+                    }
+                    noImagesMessage.style.display = 'block';
+                }
+            }
+        }
+
+
+        // --- Drag and Drop Handlers ---
+        preview.addEventListener('dragstart', (e) => {
+            // When dragging starts on an image container
+            // Only allow dragging if the target is an image-container
+            if (e.target.classList.contains('image-container')) {
+                draggedItem = e.target;
+                // Use setTimeout to allow the browser to capture the element's style before adding class
+                setTimeout(() => e.target.classList.add('dragging'), 0);
+                // We don't need to set dataTransfer data as we are reordering DOM elements directly
+                e.dataTransfer.effectAllowed = 'move';
+            } else {
+                // If something else is dragged (like the message), prevent drag
+                e.preventDefault();
+                e.dataTransfer.effectAllowed = 'none';
+            }
+        });
+
+        preview.addEventListener('dragend', (e) => {
+            // When dragging ends (successfully or not)
+            if (draggedItem) {
+                draggedItem.classList.remove('dragging'); // Clean up visual feedback
+                draggedItem = null; // Clear reference
+            }
+        });
+
+        preview.addEventListener('dragover', (e) => {
+            // When dragging over the preview area or another image
+            e.preventDefault(); // Necessary to allow dropping
+            e.dataTransfer.dropEffect = 'move'; // Visual feedback to user
+
+            const target = e.target.closest('.image-container'); // Find the image container being hovered over
+
+            // Ensure we have a dragged item and the target is not the dragged item itself
+            if (draggedItem && target && target !== draggedItem) {
+                // Determine insertion point relative to the target element
+                const rect = target.getBoundingClientRect();
+                // Get the horizontal center of the target element
+                const targetCenter = rect.left + rect.width / 2;
+
+                // Insert before the target if dragging pointer is over the left half
+                if (e.clientX < targetCenter) {
+                    preview.insertBefore(draggedItem, target);
+                } else {
+                    // Insert after the target if dragging pointer is over the right half
+                    preview.insertBefore(draggedItem, target.nextSibling);
+                }
+                updateImageNumbers(); // Update visual numbering immediately during drag
+            } else if (!target && draggedItem && e.target === preview) {
+                // If dragging over the gap in the preview container itself (not over an image), append to the end
+                // Make sure the preview container is the direct target or the drop is within its bounds but not on a child image-container
+                const previewRect = preview.getBoundingClientRect();
+                if (e.clientX >= previewRect.left && e.clientX <= previewRect.right &&
+                    e.clientY >= previewRect.top && e.clientY <= previewRect.bottom) {
+                    // Check if the drop isn't directly onto the message element if it's visible
+                    if (!e.target.classList.contains('no-images')) {
+                        preview.appendChild(draggedItem);
+                        updateImageNumbers();
+                    }
+                }
+            }
+        });
+
+        preview.addEventListener('drop', (e) => {
+            // When the dragged item is dropped
+            e.preventDefault(); // Prevent default browser handling (like opening the image)
+            // Reordering happens visually in 'dragover' for immediate feedback
+            // We just need to finalize by updating numbers and potentially saving (though we removed storage)
+            if (draggedItem) {
+                updateImageNumbers(); // Ensure numbers are correct after drop
+                draggedItem = null; // Clear dragged item reference
+                // State is implicitly updated by the DOM order, which generatePdf reads.
+            }
+        });
+
+
+        // --- UI Updates ---
+        function updateImageNumbers() {
+            // Updates the '1', '2', '3'... numbers on the image previews based on current DOM order
+            const imageContainers = preview.querySelectorAll('.image-container');
+            imageContainers.forEach((container, index) => {
+                const numberSpan = container.querySelector('.image-number');
+                if (numberSpan) {
+                    numberSpan.textContent = index + 1; // Update visual number (1-based)
+                }
+            });
+        }
+
+        function showPreview(filesToRender, startIndex = 0) {
+            // Renders image previews in the DOM for a given array of files.
+            // startIndex is the index in the global `files` array where these new files begin.
+
+            // If this is the initial render or adding files, hide the message
+            if (filesToRender.length > 0 && noImagesMessage) {
+                noImagesMessage.style.display = 'none';
+            }
+
+
+            // --- Create and Append DOM Elements ---
+            filesToRender.forEach((file, indexOffset) => {
+                const originalIndex = startIndex + indexOffset; // Calculate the original index
+
+                // Ensure the file is not null (might happen if a file at this index was previously removed)
+                if (!file) {
+                    console.warn(`Attempted to render a null file at index ${originalIndex}. Skipping.`);
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageContainer = document.createElement('div');
+                    imageContainer.classList.add('image-container');
+                    imageContainer.dataset.index = originalIndex; // Store the ORIGINAL index from the 'files' array
+                    imageContainer.setAttribute('draggable', 'true');
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = `Preview ${file.name}`; // Use filename in alt text
+                    img.onerror = () => { img.alt = "Image failed to load"; /* Basic error indication */ };
+
+                    const imageOverlay = document.createElement('div');
+                    imageOverlay.classList.add('image-overlay');
+
+                    const overlayTop = document.createElement('div');
+                    overlayTop.classList.add('overlay-top');
+
+                    const imageNumber = document.createElement('span');
+                    imageNumber.classList.add('image-number');
+                    // Number text is set later by updateImageNumbers
+
+                    const removeButton = document.createElement('button');
+                    removeButton.classList.add('remove-btn');
+                    removeButton.innerHTML = '&times;';
+                    removeButton.title = "Remove image";
+                    removeButton.addEventListener('click', (event) => {
+                        event.stopPropagation(); // Prevent drag start from button click
+                        removeFile(originalIndex); // Pass the original index to remove
+                    });
+
+                    overlayTop.appendChild(imageNumber); // Number placeholder
+                    overlayTop.appendChild(removeButton);
+                    imageOverlay.appendChild(overlayTop);
+
+                    imageContainer.appendChild(img);
+                    imageContainer.appendChild(imageOverlay);
+
+                    // Append the newly created element to the preview area
+                    preview.appendChild(imageContainer);
+
+                    // Update numbers after this image is added to the DOM
+                    updateImageNumbers();
+                    // Update the button state AFTER the image container has been added to the DOM
+                    updateGenerateButtonState();
+                };
+                reader.onerror = (err) => {
+                    console.error("FileReader error:", file.name, err);
+                    // Optionally display an error message to the user for this specific file
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Ensure numbers are correct after potential async rendering of the batch
+            // updateImageNumbers(); // Already called inside the reader.onload, which is better for async adds
+
+            // Final check for empty message display if somehow the files array ends up empty after this
+            if (preview.querySelectorAll('.image-container').length === 0) {
+                if (!document.getElementById('noImages')) {
+                    const msg = document.createElement('p');
+                    msg.id = 'noImages';
+                    msg.classList.add('no-images');
+                    msg.textContent = 'No images selected yet.';
+                    preview.appendChild(msg);
+                    noImagesMessage = document.getElementById('noImages'); // Update reference
+                }
+                noImagesMessage.style.display = 'block';
+            }
+            // updateGenerateButtonState(); // Removed from here, now called in onload
+        }
+
+
+        function updateGenerateButtonState() {
+            // Enable/disable the Generate PDF button based on whether there are images in the preview
+            const hasImages = preview.querySelectorAll('.image-container').length > 0;
+            generateBtn.disabled = !hasImages;
+            // Update the "Clear All" button state as well if desired
+            clearAllBtn.disabled = !hasImages;
+        }
+
+
+        // --- Event Listeners Setup ---
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('dragover');
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+            // Filter for image files only
+            const droppedFiles = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+            if (droppedFiles.length > 0) {
+                updateFiles(droppedFiles);
+            }
+            fileInput.value = ''; // Clear input to allow selecting the same file again
+        });
+
+        // Handle clicks on the drop area to trigger file input
+        dropArea.addEventListener('click', (e) => {
+            // Check if the click target is the drop area itself or a descriptive paragraph within it,
+            // but *not* the file input label (which already triggers the input)
+            if (e.target === dropArea || e.target.tagName === 'P') {
+                fileInput.click();
+            }
+            // The label click is handled implicitly by 'for="fileInput"'
+        });
+
+
+        fileInput.addEventListener('change', (e) => {
+            // Handle file selection via browse button
+            // Filter for image files only
+            const selectedFiles = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
+            if (selectedFiles.length > 0) {
+                updateFiles(selectedFiles);
+            }
+            fileInput.value = ''; // Reset input to allow selecting the same files again
+        });
+
+        // Handle clicks on option buttons (Resolution, Paper Size) using event delegation
+        document.querySelectorAll('.btn-set').forEach(set => {
+            set.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('active')) {
+                    // Remove 'active' from all buttons in this set
+                    set.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    // Add 'active' to the clicked button
+                    e.target.classList.add('active');
+                    // Options changes don't require state saving in this version
+                }
+            });
+        });
+
+
+        themeToggle.addEventListener('change', () => {
+            // Toggle dark/light theme and save preference (only theme is saved)
+            document.body.classList.toggle('dark', themeToggle.checked);
+            localStorage.setItem('theme', themeToggle.checked ? 'dark' : 'light');
+        });
+
+        clearAllBtn.addEventListener('click', () => {
+            // Get all image elements
+            const imageContainers = preview.querySelectorAll('.image-container');
+
+            if (imageContainers.length === 0) {
+                // Button should be disabled, but handle defensively
+                return;
+            }
+
+            // Disable clear button immediately
+            clearAllBtn.disabled = true;
+            generateBtn.disabled = true; // Also disable generate during clearing
+
+            // Apply removal transition to all images
+            imageContainers.forEach(container => {
+                container.style.opacity = '0';
+                container.style.transform = 'scale(0.8)';
+            });
+
+            // Wait for the transition to finish before clearing the DOM and state
+            // Use a timeout slightly longer than the CSS transition duration (0.3s)
+            setTimeout(() => {
+                files = []; // Clear files array
+                preview.innerHTML = ''; // Clear visual preview
+
+                // Re-add the 'no images' message after clearing
+                const msg = document.createElement('p');
+                msg.id = 'noImages';
+                msg.classList.add('no-images'); // Add the CSS class
+                msg.textContent = 'No images selected yet.';
+                preview.appendChild(msg);
+                noImagesMessage = document.getElementById('noImages'); // Re-get the reference
+                noImagesMessage.style.display = 'block'; // Ensure it's visible
+
+
+                updateGenerateButtonState(); // Re-enable/disable buttons based on new state (both should become disabled)
+
+            }, 300); // Match this duration to the CSS transition time
+
+        });
+
+        // --- PDF Generation ---
+        generateBtn.addEventListener('click', async () => {
+            // Get image containers in their current visual order from the DOM
+            const orderedImageContainers = Array.from(preview.querySelectorAll('.image-container'));
+
+            if (orderedImageContainers.length === 0) {
+                // This case should ideally be prevented by disabling the button,
+                // but include an alert as a fallback.
+                alert('Please add images first.');
+                return;
+            }
+
+            // Disable button and show progress
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            // Removed text content from progress bar as per your CSS, relies on width filling
+
+            try {
+                // Get selected options
+                const resolution = getSelectedOption('resolutionBtns');
+                const paperKey = getSelectedOption('paperBtns');
+                const blur = blurBackgroundCheckbox.checked;
+
+                const { jsPDF } = window.jspdf;
+                const paperInfo = paperSizes[paperKey] || paperSizes['a4']; // Default to A4
+                // Determine PDF orientation based on selected paper size
+                const orientation = paperInfo.width > paperInfo.height ? 'landscape' : 'portrait';
+
+
+                // Initialize jsPDF with the selected paper size and orientation
+                const pdf = new jsPDF({
+                    orientation: orientation,
+                    unit: 'pt', // Use points, consistent with paperSizes
+                    format: paperKey // Use the paper size key for jsPDF format
+                });
+
+                // Get the actual file objects based on the DOM order of their containers
+                const orderedFiles = orderedImageContainers.map(container => {
+                    const originalIndex = parseInt(container.dataset.index);
+                    // Return the file from the global 'files' array using the stored original index
+                    return files[originalIndex];
+                }).filter(file => file !== null); // Filter out any null entries in case 'files' has gaps
+
+                const totalFiles = orderedFiles.length;
+                if (totalFiles === 0) {
+                    alert('No valid images found to generate PDF.');
+                    return; // Exit if no valid files were found after mapping
+                }
+
+
+                for (let i = 0; i < totalFiles; i++) {
+                    const file = orderedFiles[i];
+
+                    // Update progress bar before processing each image
+                    // Calculate progress based on files processed so far
+                    const currentProgress = Math.round(((i) / totalFiles) * 100); // Progress before current file processing
+                    progressBar.style.width = `${currentProgress}%`;
+                    // progressBar.textContent = `${currentProgress}%`; // Removed text as per CSS
+
+
+                    // Process the image onto a canvas according to selected options
+                    // This step can be time-consuming
+                    const canvas = await processImage(file, resolution, paperKey, blur);
+
+                    // Add a new page for every image *except the first one*
+                    if (i > 0) {
+                        pdf.addPage();
+                    }
+
+                    // Get canvas dimensions
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+
+                    // Calculate scaling to fit the canvas content to the PDF page size
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+
+
+                    const imgData = canvas.toDataURL('image/jpeg', 0.9); // Convert canvas to JPEG data URL
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, null, 'FAST'); // Add image to PDF page
+                }
+
+                // Final progress update
+                progressBar.style.width = '100%';
+                // progressBar.textContent = '100%'; // Removed text as per CSS
+
+
+                const nameInput = document.getElementById('FileName'); 
+                let pdfFileName = 'ExpressPDF.pdf';
+                if (nameInput && nameInput.value.trim() !== '') {
+                    pdfFileName = nameInput.value.trim() + '.pdf';
+                    nameInput.value = ''; // Clear the input field after use
+                }
+                pdf.save(pdfFileName);
+
+            } catch (error) {
+                console.error("Error generating PDF:", error);
+                alert(`An error occurred during PDF generation: ${error.message || error}`);
+            } finally {
+                // Reset UI elements after generation (success or failure)
+                // Add a small delay before hiding progress to show 100% briefly
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    // progressBar.textContent = '0%'; // Removed text as per CSS
+                    generateBtn.textContent = 'Generate PDF';
+                    updateGenerateButtonState(); // Re-enable button if images still exist
+                }, 500); // 500ms delay
+            }
+        });
+
+        // --- Image Processing Logic ---
+        const resolutionPresets = {
+            '720p': 1280, // Target height for the canvas
+            '1080p': 1920,
+            '2160p': 3840,
+            '4k': 4096 // Note: 4K typically refers to width (3840 or 4096). Using 4096 as target height here for consistency with presets, which might be intended for width. Adjusted logic slightly to target *height* based on preset value, then calculate width from paper aspect ratio. This ensures consistent "resolution" relative to the output page size.
+        };
+        const paperSizes = { // Dimensions in points (pt) - standard jsPDF units
+            'a4': { width: 595.28, height: 841.89 },
+            'a3': { width: 841.89, height: 1190.55 },
+            'a5': { width: 419.53, height: 595.28 },
+            'letter': { width: 612, height: 792 }
+        };
+
+        function getSelectedOption(groupId) {
+            // Gets the value of the selected button in a button set
+            // *** FIX START ***
+            const activeBtn = document.querySelector(`#${groupId} .active`); // Corrected selector
+            // *** FIX END ***
+            return activeBtn ? activeBtn.dataset.value : null;
+        }
+
+        function loadImage(file) {
+            // Loads an image file and returns a Promise resolving with the HTMLImageElement
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                // Use object URL for efficiency, revoke after load/error
+                const imgUrl = URL.createObjectURL(file);
+
+                img.onload = () => {
+                    resolve(img);
+                    URL.revokeObjectURL(imgUrl); // Clean up object URL
+                };
+                img.onerror = (err) => {
+                    console.error("Image loading error:", file.name, err);
+                    reject(new Error(`Failed to load image: ${file.name}`));
+                    URL.revokeObjectURL(imgUrl); // Clean up on error too
+                };
+                img.src = imgUrl;
+            });
+        }
+
+        function applyBlur(ctx, img, canvasWidth, canvasHeight) {
+            // Draws the image stretched to fill the canvas and applies a blur filter
+            ctx.save(); // Save the context state
+            ctx.filter = 'blur(20px) brightness(0.9)'; // Apply blur and slight dimming filter
+            ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight); // Draw stretched image
+            ctx.restore(); // Restore the context state (removes filter)
+        }
+
+        async function processImage(file, resolutionKey, paperKey, useBlur) {
+            // Processes a single image onto a canvas with selected options
+            // The canvas is sized according to the target resolution and the paper aspect ratio.
+
+            const targetHeight = resolutionPresets[resolutionKey] || resolutionPresets['1080p']; // Default to 1080p height
+            const paper = paperSizes[paperKey] || paperSizes['a4']; // Default to A4
+            const paperAspectRatio = paper.width / paper.height;
+
+            // Calculate canvas dimensions based on target height and paper aspect ratio
+            const canvasHeight = targetHeight;
+            const canvasWidth = Math.round(targetHeight * paperAspectRatio); // Ensure width matches paper aspect ratio
+
+
+            const img = await loadImage(file); // Load the image
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Draw Background (Blur or White)
+            if (useBlur) {
+                applyBlur(ctx, img, canvasWidth, canvasHeight);
+            } else {
+                ctx.fillStyle = '#ffffff'; // White background
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Draw Foreground Image (Centered and Scaled without distortion within the background)
+            const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+            let drawWidth, drawHeight;
+
+            // Determine scaling factor to fit the image within the canvas while maintaining aspect ratio
+            // We want to 'contain' the image within the canvas space.
+            const canvasAspectRatio = canvasWidth / canvasHeight;
+
+            if (imgAspectRatio > canvasAspectRatio) {
+                // Image is wider relative to its height than the canvas
+                // Fit to canvas width, calculate height
+                drawWidth = canvasWidth;
+                drawHeight = drawWidth / imgAspectRatio;
+            } else {
+                // Image is taller relative to its width than the canvas (or same aspect ratio)
+                // Fit to canvas height, calculate width
+                drawHeight = canvasHeight;
+                drawWidth = drawHeight * imgAspectRatio;
+            }
+
+            // Calculate centering position
+            const dx = (canvasWidth - drawWidth) / 2;
+            const dy = (canvasHeight - drawHeight) / 2;
+
+            // Draw the scaled and centered image
+            ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+
+            return canvas; // Return the processed canvas
+        }
+
+    </script>
+
+</body>
+
+</html>
